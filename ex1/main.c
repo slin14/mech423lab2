@@ -2,7 +2,7 @@
 
 
 /**
- * main.c
+ * main.c - ex1
  */
 int main(void)
 {
