@@ -15,12 +15,16 @@ int main(void)
     CSCTL1 = DCOFSEL0 + DCOFSEL1;           // DCO = 8 MHz
     CSCTL2 = SELM0 + SELM1 + SELA0 + SELA1 + SELS0 + SELS1; // MCLK = DCO, ACLK = DCO, SMCLK = DCO
 
+    // Configure PJ.0 as output (LED1)
+    PJDIR |= BIT0;
+    PJOUT &= ~BIT0; // turn LED1 off
+
     // Configure ports for UART
     P2SEL0 &= ~(BIT0 + BIT1);
     P2SEL1 |= BIT0 + BIT1;
 
     UCA0CTLW0 |= UCSWRST;                   // Put the UART in software reset
-    UCA0CTLW0 |= UCSSEL0;                    // Run the UART using ACLK
+    UCA0CTLW0 |= UCSSEL0;                   // Run the UART using ACLK
     UCA0MCTLW = UCOS16 + UCBRF0 + 0x4900;   // Baud rate = 9600 from an 8 MHz clock
     UCA0BRW = 52;
     UCA0CTLW0 &= ~UCSWRST;                  // release UART for operation
@@ -31,13 +35,13 @@ int main(void)
 
     while (1)
     {
-        // Periodically transmit an "A" character
-/*
+        // Periodically transmit an "a" character
+
         while (!(UCA0IFG & UCTXIFG));
-        UCA0TXBUF = 'A';
+        UCA0TXBUF = 'a';
         for (i=0;i<20000;i++)
             _NOP();
-*/
+
     }
     return 0;
 }
@@ -51,4 +55,7 @@ __interrupt void USCI_A0_ISR(void)
     UCA0TXBUF = RxByte;                     // Echo back the received byte
     while (!(UCA0IFG & UCTXIFG));           // Wait until the previous Tx is finished
     UCA0TXBUF = RxByte + 1;                 // Echo back the received byte + 1
+
+    if (RxByte == 'j') PJOUT |= BIT0;       // Turn on LED1 when a 'j' is received
+    else if (RxByte == 'k') PJOUT &= ~BIT0; // Turn off LED1 when a 'k' is received
 }
