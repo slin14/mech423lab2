@@ -2,13 +2,13 @@
 
 
 /**
- * main.c - ex1
+ * main.c
  */
 int main(void)
 {
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
-	
-	// set up SMCLK to run on the DCO
+    WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
+
+    // set up SMCLK to run on the DCO
     CSCTL0_H = 0xA5;            // CSKEY password
     CSCTL2 |= BIT5 + BIT4;
     CSCTL2 &= ~ BIT6;
@@ -26,5 +26,5 @@ int main(void)
     P3SEL1 |= BIT4;
     P3SEL0 |= BIT4;
 
-	return 0;
+    return 0;
 }
