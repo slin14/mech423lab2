@@ -1,8 +1,8 @@
 #include <msp430.h> 
 
-volatile unsigned int prevCap = 0;
+volatile unsigned int prevCap = 0; // volatile tells compiler the variable value can be modified at any point outside of this code
 volatile unsigned int cap = 0;
-volatile unsigned int measurement = 0;
+unsigned short measurement = 0;
 
 /**
  * main.c - ex6
@@ -82,7 +82,7 @@ __interrupt void timerA(void)
         cap = TA0CCR1;
         if(!(TA0CCTL1 & CCI)){ // current output is low (it was previously high)
             measurement = cap - prevCap; // save the measurement (time now - starting time)
-            TA0CCR2 = measurement;
+            TA0CCR2 = measurement; // save to a register (trying to see it in the debugger)
         }
         else if (TA0CCTL1 & CCI) { // current output is high (it was previously low)
             prevCap = cap; // reset the measurement starting time
