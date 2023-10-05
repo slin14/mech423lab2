@@ -1,0 +1,28 @@
+# Header file
+/c/ti/ccs1240/ccs/ccs_base/msp430/include/msp430fr5739.h
+
+# Code examples
+/c/Users/sophi/Documents/4year/MECH423/doc/MSP430FR57xx_Code_Examples/C/
+
+# Resets
+BOR    brownout reset
+POR    power-on reset
+PUC    power-up clear
+
+# Clock Sources
+XT1    Crystal 1 (LFXT1 - low freq)
+XT2    Crystal 2
+DCO    Digitally Controlled Oscillator (internal in IC)
+VLO    Very low freq oscillator
+
+# Internal Clocks
+MCLK   Master clk
+ACLK   Auxillary clk
+SMCLK  Sub Master clk
+
+# Peripherals
+CPU
+UART
+ADC
+Timers
+Ports
