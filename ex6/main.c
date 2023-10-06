@@ -82,10 +82,11 @@ __interrupt void timerA(void)
         cap = TA0CCR1;
         if(!(TA0CCTL1 & CCI)){ // current output is low (it was previously high)
             measurement = cap - prevCap; // save the measurement (time now - starting time)
-            TA0CCR2 = measurement; // save to a register (trying to see it in the debugger)
+            // TA0CCR2 = measurement; // save to a register (trying to see it in the debugger)
         }
         else if (TA0CCTL1 & CCI) { // current output is high (it was previously low)
             prevCap = cap; // reset the measurement starting time
         }
     }
+    TA0CCTL1 &= ~CCIFG; // clear IFG
 }
