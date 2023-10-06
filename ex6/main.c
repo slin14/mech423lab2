@@ -9,32 +9,32 @@ unsigned short measurement = 0;
  */
 int main(void)
 {
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
+    WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
 
-	//////////////////////////////////////////
-	// ex5
+    //////////////////////////////////////////
+    // ex5
 
-	// configure P3.4 as output
-	P3DIR |= BIT4;
-	// configure P3.5 as output
+    // configure P3.4 as output
+    P3DIR |= BIT4;
+    // configure P3.5 as output
     P3DIR |= BIT5;
 
-	// set timer output to output on P3.4
-	P3SEL0 |= BIT4;
+    // set timer output to output on P3.4
+    P3SEL0 |= BIT4;
     // set timer output to output on P3.5
     P3SEL0 |= BIT5;
 
-	// configure TB1.1 to output 500 Hz square wave on P3.4
-	//TB1CTL |= BIT9; // select source clock as SMCLK (bit 9-8 = 10b)
-	//TB1CTL |= BIT4; // up mode: Timer counts up to TAxCCR0
-	TB1CTL = TASSEL_2 + MC_1; // SMCLK, UP mode
+    // configure TB1.1 to output 500 Hz square wave on P3.4
+    //TB1CTL |= BIT9; // select source clock as SMCLK (bit 9-8 = 10b)
+    //TB1CTL |= BIT4; // up mode: Timer counts up to TAxCCR0
+    TB1CTL = TASSEL_2 + MC_1; // SMCLK, UP mode
 
 
-	TB1CCTL1 |= OUTMOD_7;    // reset/set mode
-							 // clr output when TB1R == TB1CCR0
-							 // set output when TB1R == TB1CCR1
-	TB1CCR0 = 2000;
-	TB1CCR1 = 1000; // 50% duty cycle
+    TB1CCTL1 |= OUTMOD_7;    // reset/set mode
+                             // clr output when TB1R == TB1CCR0
+                             // set output when TB1R == TB1CCR1
+    TB1CCR0 = 2000;
+    TB1CCR1 = 1000; // 50% duty cycle
 
 
 
@@ -50,7 +50,7 @@ int main(void)
     // configure P1.0 as input to timerA TA0.1
     P1DIR &= ~BIT0;
     P1SEL1 &= ~BIT0;
-    P1SEL0 |= BIT1;
+    P1SEL0 |= BIT0;
 
     // configure Timer A
     TA0CTL   = TASSEL_2 + // Timer A clock source select: 2 - SMCLK
@@ -68,9 +68,9 @@ int main(void)
     // enable global interrupt
     _EINT();
 
-	while(1);
-	
-	return 0;
+    while(1);
+
+    return 0;
 }
 
 // ISR for capture from TA0.1
