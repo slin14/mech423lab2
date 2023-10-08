@@ -1,12 +1,13 @@
 #include <msp430.h> 
-volatile unsigned int timerFlag = 0;
-volatile unsigned char ax = 0;
-volatile unsigned char ay = 0;
-volatile unsigned char az = 0;
 
 #define X_CH ADC10INCH_12
 #define Y_CH ADC10INCH_13
 #define Z_CH ADC10INCH_14
+
+volatile unsigned char ax = 0;
+volatile unsigned char ay = 0;
+volatile unsigned char az = 0;
+unsigned char datapacket = 255;
 
 void txUART(unsigned char in)
 {
@@ -21,14 +22,16 @@ unsigned int read1channel(int channel)
     ADC10CTL0 |= ADC10ENC + // enable conversion
                  ADC10SC  ; // start conversion
 
-    // wait until ADC is done
-    while((ADC10IFG & ADC10IFG0) == 0);
+    // wait for ADC conversion complete
+    while(ADC10CTL1 & ADC10BUSY);
     int result = ADC10MEM0;
 
     // ADC disable conversion to switch channel
     ADC10CTL0 &= ~ADC10ENC;
 
     ADC10MCTL0 &= ~channel; // clear channel selection
+
+    return result;
 }
 
 /**
@@ -71,12 +74,12 @@ int main(void)
     P2SEL0 &= ~(BIT0 + BIT1); // redundant
     P2SEL1 |= BIT0 + BIT1;
 
-    UCA0CTLW0 |= UCSWRST;                   // Put the UART in software reset
-    UCA0CTLW0 |= UCSSEL1;                   // Run the UART using SMCLK
-    UCA0MCTLW = UCOS16 + UCBRF1 + 0xD600;   // Baud rate = 9600 from an 1 MHz clock
-    UCA0BRW = 104;
-    //UCA0BRW = 6;
-    UCA0CTLW0 &= ~UCSWRST;                  // release UART for operation
+    UCA0CTL1  = UCSWRST;                   // Put the UART in software reset
+    UCA0CTL1 |= UCSSEL1;                   // Run the UART using SMCLK
+    UCA0MCTLW = UCOS16 + UCBRF1 + 0xD600;  // Baud rate = 9600 from an 1 MHz clock
+    //UCA0BRW = 104;
+    UCA0BRW = 6;
+    UCA0CTL1 &= ~UCSWRST;                  // release UART for operation
     //UCA0IE |= UCRXIE;                       // Enable UART Rx interrupt
 
     /////////////////////////////////////////////////
@@ -98,7 +101,7 @@ int main(void)
 // UART transmit the sampled ADC every 40ms
 __interrupt void timerA(void)
 {
-    txUART(255);
+    txUART(datapacket);
     txUART(ax);
     txUART(ay);
     txUART(az);
