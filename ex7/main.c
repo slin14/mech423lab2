@@ -87,9 +87,10 @@ int main(void)
     _EINT();
 
     while(1){
-        ax = read1channel(X_CH) >> 2;
-        ay = read1channel(Y_CH) >> 2;
-        az = read1channel(Z_CH) >> 2;
+        txUART(datapacket);
+        txUART(ax);
+        txUART(ay);
+        txUART(az);
     }
 
     return 0;
@@ -101,10 +102,9 @@ int main(void)
 // UART transmit the sampled ADC every 40ms
 __interrupt void timerA(void)
 {
-    txUART(datapacket);
-    txUART(ax);
-    txUART(ay);
-    txUART(az);
+    ax = read1channel(X_CH) >> 2;
+    ay = read1channel(Y_CH) >> 2;
+    az = read1channel(Z_CH) >> 2;
 
     TA0CCTL0 &= ~CCIFG; // clear IFG
 }
