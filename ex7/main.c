@@ -15,7 +15,7 @@ void txUART(unsigned char in)
     UCA0TXBUF = in;
 }
 
-unsigned int read1channel(int channel)
+unsigned int adcReadChannel(int channel)
 {
     ADC10MCTL0 |= channel;  // channel select; Vref=AVCC
     // sample ADC (enable conversion)
@@ -54,7 +54,7 @@ int main(void)
     ADC10CTL0 |= ADC10ON    + // turn on ADC
                  ADC10SHT_2 ; // sample & hold 16 clks
     ADC10CTL1 |= ADC10SHP;    // sampling input is sourced from timer
-    //ADC10CTL2 |= ADC10RES;  // 10-bit conversion results by default
+    //ADC10CTL2 |= ADC10RES;  // 10-bit conversion results
 
     /////////////////////////////////////////////////
     // Set up Timer A to interrupt every 40ms (25Hz)
@@ -74,12 +74,10 @@ int main(void)
     P2SEL0 &= ~(BIT0 + BIT1); // redundant
     P2SEL1 |= BIT0 + BIT1;
 
-    UCA0CTL1  = UCSWRST;                   // Put the UART in software reset
-    UCA0CTL1 |= UCSSEL1;                   // Run the UART using SMCLK
-    UCA0MCTLW = UCOS16 + UCBRF1 + 0xD600;  // Baud rate = 9600 from an 1 MHz clock
-    //UCA0BRW = 104;
-    UCA0BRW = 6;
-    UCA0CTL1 &= ~UCSWRST;                  // release UART for operation
+    UCA0CTL1 = UCSWRST;                 // hold UCA in software reset
+    UCA0CTL1 |= UCSSEL0|UCSSEL1;        // set source to SMCLK 1MHz
+    UCA0BRW = 104;                      // Baud rate = 9600 from an 1 MHz clock
+    UCA0CTL1 &= ~UCSWRST;               // take UCA out of software reset
     //UCA0IE |= UCRXIE;                       // Enable UART Rx interrupt
 
     /////////////////////////////////////////////////
@@ -102,13 +100,14 @@ int main(void)
 // UART transmit the sampled ADC every 40ms
 __interrupt void timerA(void)
 {
-    ax = read1channel(X_CH) >> 2;
-    ay = read1channel(Y_CH) >> 2;
-    az = read1channel(Z_CH) >> 2;
+    ax = adcReadChannel(X_CH) >> 2;
+    ay = adcReadChannel(Y_CH) >> 2;
+    az = adcReadChannel(Z_CH) >> 2;
 
     TA0CCTL0 &= ~CCIFG; // clear IFG
 }
 
+/////////////////////////////////////////////////
 // ISR for UART Receive
 #pragma vector = USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void)
@@ -117,4 +116,3 @@ __interrupt void USCI_A0_ISR(void)
     RxByte = UCA0RXBUF;                     // Get the new byte from the Rx buffer
     // UART RX IFG self clearing
 }
-
