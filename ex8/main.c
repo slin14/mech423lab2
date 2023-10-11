@@ -13,6 +13,7 @@ temperature, the more LEDs will be lit. Resting your finger on the NTC should li
 5. As a test, place your finger in the NTC for 15 seconds, then release. The LEDs should all light up. After
 removing your finger, the LEDs should turn off 1 by 1.
  */
+#define TIMER_MILLISEC 40
 
 #define X_CH   ADC10INCH_12
 #define Y_CH   ADC10INCH_13
@@ -126,10 +127,10 @@ int main(void)
     UCA0CTL1 &= ~UCSWRST;               // take UCA out of software reset
 
     /////////////////////////////////////////////////
-    // Set up Timer A to interrupt every 40ms (25Hz)
+    // Set up Timer A to interrupt every TIMER_MILLISEC (1000/TIMER_MILLISEC Hz)
     // configure TA0.1
     TA0CCTL0 |= CCIE;    // Capture/compare interrupt enable
-    TA0CCR0 = 40000 - 1; // overflow at 40ms if 1MHz in
+    TA0CCR0 = TIMER_MILLISEC * 1000 - 1; // overflow at X ms if 1MHz in
 
     // start Timer A
     TA0CTL  |= TASSEL_2 + // Timer A clock source select: 2 - SMCLK
