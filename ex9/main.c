@@ -11,7 +11,8 @@ unsigned int i;
 void enqueue(int val)
 {
     if ((head + 1) % BUF_SIZE == tail) { // buffer FULL (head + 1 == tail)
-        //
+        // Error: buffer full
+        txUART(255);
     }
     else { // enqueue
         buf[head] = val;
@@ -22,7 +23,8 @@ void enqueue(int val)
 int dequeue(void) {
     int result = 0;
     if (head == tail) { // buffer empty
-        //
+        // Error: buffer empty
+        txUART(0);
     }
     else { // dequeue
         result = buf[tail];
@@ -38,10 +40,11 @@ void txUART(unsigned char in)
     UCA0TXBUF = in;
 }
 
+// testing: function to print buffer contents over UART
 void printBufUART()
 {
     // print circular buffer contents
-    txUART(0);
+    txUART(0); // start
     for (i = tail; i != head; i = (i + 1) % BUF_SIZE) {
         txUART(buf[i]);
     }
@@ -50,7 +53,7 @@ void printBufUART()
 
 
 /**
- * main.c
+ * main.c - ex9
  */
 int main(void)
 {
@@ -103,13 +106,9 @@ __interrupt void USCI_A0_ISR(void)
 
     if (RxByte == dequeueByte) { // dequeue if receive a carriage return
         dequeuedItem = dequeue();
-        P3OUT |= BIT8;
-        // transmit
     }
     else {
         enqueue(RxByte);
     }
-    printBufUART();
-
-    // UART RX IFG self clearing
+    //printBufUART(); // testing
 }
